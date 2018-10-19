@@ -1,0 +1,17 @@
+{
+  "name": "h5_gamr",
+  "homepage": "https://github.com/bevexed/h5_game",
+  "authors": [
+    "bevexed <547551650@qq.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
