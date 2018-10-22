@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            background: #414141;
+            text-align: center;
+        }
+
+        #game {
+            border-radius: 10px;
+            border: 1px solid #666;
+            /*background: #232 url("");*/
+            width: 500px;
+            height: 460px;
+            margin: 0 auto;
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+        }
+
+        #cards {
+            position: relative;
+            width: 380px;
+            height: 400px;
+        }
+
+        .card {
+            -webkit-perspective: 600;
+            width: 80px;
+            height: 120px;
+            position: absolute;
+            transition: all .3s;
+        }
+
+        .face {
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            -webkit-transition-property: opcity, transform, box-shadow;
+            -webkit-transition-duration: .3s;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .front {
+            background: url("img/4.png") no-repeat center/70px, linear-gradient(#b3f0ff, blue);
+            z-index: 10;
+        }
+
+        .back {
+            background: #efefef url("img/pk.png");
+            -webkit-transform: rotate3d(0, 1, 0, -180deg);
+            z-index: 8;
+        }
+
+        .card:hover .face, .card-flipped .face {
+            box-shadow: 0 0 10px #aaa;
+        }
+
+        .card-flipped .front {
+            -webkit-transform: rotate3d(0, 1, 0, 180deg);
+            z-index: 8;
+        }
+
+        .card-flipped .back {
+            -webkit-transform: rotate3d(0, 1, 0, 0);
+            z-index: 10;
+        }
+
+        .card-removed {
+            opacity: 0
+        }
+
+        .cardAQ {
+            background-position: -880px 0;
+        }
+
+        .cardAK {
+            background-position: -880px 0;
+        }
+
+        .cardBQ {
+            background-position: -880px 0;
+        }
+
+        .cardBX {
+            background-position: -880px 0;
+        }
+
+        .cardCK {
+            background-position: -880px 0;
+        }
+
+        .cardDQ {
+            background-position: -880px 0;
+        }
+
+        .cardDK {
+            background-position: -880px 0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>CSS3 Matching Game</h1>
+</header>
+<section id="game">
+    <div id="cards">
+        <div class="card">
+            <div class="face front"></div>
+            <div class="face back"></div>
+        </div>
+    </div>
+</section>
+<footer>
+    <p>...</p>
+</footer>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    const matchingGame = {}
+    matchingGame.deck = [
+        'cardAk', 'cardAk',
+        'cardAQ', 'cardAQ',
+        'cardAJ', 'cardAJ',
+        'cardBK', 'cardBK',
+        'cardBQ', 'cardBQ',
+        'carDBJ', 'cardBJ'
+    ]
+    $(function () {
+        matchingGame.deck.sort(shuffle)
+        for (let i = 0; i < 11; i++) {
+            $(".card:first-child").clone().appendTo("#cards")
+        }
+        $("#cards").children().each(function (index) {
+            $(this).css({
+                "left": ($(this).width() + 20) * (index % 4),
+                "top": ($(this).height() + 20) * Math.floor((index / 4))
+            })
+
+            let pattern = matchingGame.deck.pop();
+            $(this).find(".back").addClass(pattern)
+            $(this).attr("data-pattern", pattern)
+            $(this).click(selectCard);
+        })
+    })
+
+    function shuffle() {
+        return 0.5 - Math.random()
+    }
+
+    function selectCard() {
+        if ($(".card-flipped").length > 1) {
+            return;
+        }
+        $(this).addClass("card-flipped")
+        console.log($(this))
+        if ($(".card-flipped").length == 2) {
+            setTimeout(checkPattern, 700)
+        }
+    }
+
+    function checkPattern() {
+        if (isMatchPattern()) {
+            $(".card-flipped").removeClass("card-flipped").addClass("card-removed")
+            $(".card-removed").bind("webkitTransitionEnd", removeTookCards)
+        } else {
+            $(".card-flipped").removeClass("car-flipped")
+        }
+    }
+
+    function isMatchPattern() {
+        let cards = $(".car-flipped")
+        let pattern = $(cards[0]).data("pattern")
+        let anotherPattern = $(cards[1]).data("pattern")
+        return (pattern == anotherPattern)
+    }
+
+    function removeTookCards() {
+        $(".card-removed").remove()
+    }
+
+
+</script>
+</body>
+</html>
