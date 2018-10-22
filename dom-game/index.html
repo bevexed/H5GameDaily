@@ -50,6 +50,10 @@
 </head>
 <body>
 <div id="game">
+    <div id="scoreboard">
+        <div class="score">Player A : <span id="scoreA">0</span></div>
+        <div class="score">Player B : <span id="scoreB">0</span></div>
+    </div>
     <div id="playground">
         <div id="paddleA" class="paddle"></div>
         <div id="paddleB" class="paddle"></div>
@@ -66,7 +70,10 @@
     }
 
     // 全局变量数据存储状态
-    const pingPang = {};
+    const pingPang = {
+        scoreA: 0,
+        scoreB: 0
+    };
     pingPang.pressKeys = [];
     pingPang.ball = {
         speed: 5,
@@ -121,7 +128,7 @@
         let ball = pingPang.ball
         //检测球台边沿
         //检测底边
-        if (ball.y + ball.speed + ball.directionY > playgroundHeight) {
+        if (ball.y + ball.speed * ball.directionY > playgroundHeight) {
             ball.directionY = -1
         }
         //检测顶边
@@ -129,7 +136,7 @@
             ball.directionY = 1
         }
         //检测右边
-        if (ball.x + ball.speed + ball.directionX > playgroundWidth) {
+        if (ball.x + ball.speed * ball.directionX > playgroundWidth) {
             ball.directionX = -1
         }
         //检测左边
@@ -141,7 +148,7 @@
 
         //检测球拍和球碰撞
         //左边球拍
-        let paddleAX = parseInt($('#paddleA').css('left'))+parseInt($('#paddleA').css('width'))
+        let paddleAX = parseInt($('#paddleA').css('left')) + parseInt($('#paddleA').css('width'))
         let paddleAYBottom = parseInt($('#paddleA').css('top')) + parseInt($('#paddleA').css('height'))
         let paddleAYTop = parseInt($('#paddleA').css('top'))
         if (ball.x + ball.speed * ball.directionX < paddleAX) {
@@ -159,30 +166,25 @@
                 ball.directionX = -1
             }
         }
-
         //检测丢分
-        if(ball.x + ball.speed * ball.directionX > playgroundWidth){
+        if (ball.x + ball.speed * ball.directionX >= playgroundWidth) {
             //玩家B丢分
             //重置乒乓球
             ball.x = 250
             ball.y = 100
-            $('#ball').css({
-                'left':ball.x,
-                'top':ball.y
-            })
             ball.directionX = -1
+            pingPang.scoreA++
+            $('#scoreA').html(pingPang.scoreA)
         }
 
-        if(ball.x + ball.speed * ball.directionX < 0){
+        if (ball.x + ball.speed * ball.directionX < 0) {
             //玩家A丢分
             //重置乒乓球
-            ball.x = 250
+            ball.x = 150
             ball.y = 100
-            $('#ball').css({
-                'left':ball.x,
-                'top':ball.y
-            })
             ball.directionX = 1
+            pingPang.scoreB++
+            $('#scoreB').html(pingPang.scoreB)
         }
 
         $('#ball').css({

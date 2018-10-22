@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            background: #aaa;
+        }
+
+        .card {
+            width: 80px;
+            height: 120px;
+            margin: 20px;
+            background-color: #efefef;
+            position: absolute;
+            -webkit-transition: all 1s linear;
+        }
+
+        .cardAK {
+            background-image: url("./img/3.jpg");
+        }
+
+        .cardAQ {
+            background-image: url("./img/2.jpg");
+        }
+
+        .rotateRight {
+            -webkit-transform: rotate3d(0, 0, 1, 90deg);
+        }
+
+        .moveAndScale {
+            -webkit-transform: translate3d(150px, 150px, 0) scale3d(1.5, 1.5, 1);
+        }
+
+    </style>
+    <script src="../bower_components/jq/dist/jquery.min.js"></script>
+</head>
+<body>
+<header>
+    <h1>GAME</h1>
+</header>
+
+<section id="game">
+    <div id="cards">
+        <div id="card1" class="card cardAK"></div>
+        <div id="card2" class="card cardAQ"></div>
+    </div>
+</section>
+
+<footer>
+
+</footer>
+</body>
+<script>
+    $(function () {
+        $('#card1').addClass("moveAndScale")
+        $('#card2').addClass("rotateRight")
+    })
+</script>
+</html>

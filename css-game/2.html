@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #game {
+            background-color: #9c9;
+            padding: 5px;
+        }
+
+        .card {
+            -webkit-perspective: 600;
+            width: 80px;
+            height: 120px;
+            margin-top: 5px;
+        }
+
+        .face {
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            -webkit-transition: all .3s;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .front {
+            background: #966;
+            z-index: 10;
+        }
+
+        .back {
+            background: #eaa;
+            -webkit-transform: rotate3d(0, 1, 0, -180deg);
+        }
+
+        .card-flipped .front{
+            -webkit-transform: rotate3d(0,1,0,180deg);
+            z-index: 0;
+        }
+
+        .card-flipped .back{
+            -webkit-transform: rotate3d(0,1,0,0);
+            z-index: 10;
+        }
+
+        .cardAK{
+            background: url("./img/2.jpg");
+        }
+
+        .cardAQ{
+            background: url("./img/3.jpg");
+        }
+    </style>
+</head>
+<body>
+<section id="game">
+    <div id="cards">
+        <div class="card">
+            <div class="face front"></div>
+            <div class="face back cardAK"></div>
+        </div>
+        <div class="card">
+            <div class="face front"></div>
+            <div class="face back cardAQ"></div>
+        </div>
+    </div>
+</section>
+</body>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    $(function () {
+        $('#cards').children().each(function (index) {
+            $(this).click(function () {
+                $(this).toggleClass("card-flipped")
+            })
+        })
+    })
+
+</script>
+</html>
