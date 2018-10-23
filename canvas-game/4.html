@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>drawCircle</title>
+    <style>
+        #game {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Drawing in Canvas</h1>
+</header>
+<canvas id="game" width="768" height="400">
+    滚
+</canvas>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    const untangleGame = {
+        circles: [],
+        thinLineThickness: 1,
+        lines: []
+    }
+
+    $(function () {
+        let canvas = document.getElementById('game')
+
+        let width = canvas.width
+        let height = canvas.height
+
+        let circleCount = 5
+        for (let i = 0; i < circleCount; i++) {
+            let x = Math.random() * width
+            let y = Math.random() * height
+            drawCircle(canvas, randomColor(), x, y, 30, 0, Math.PI * 2, true)
+            untangleGame.circles.push(new Circle(x, y, 30))
+        }
+
+        for (let i = 0; i < untangleGame.circles.length; i++) {
+            let startPoint = untangleGame.circles[i]
+            for (let j = 0 ; j<i ;j++){
+                let endPoint = untangleGame.circles[j]
+                drawLine(canvas,startPoint.x,startPoint.y,endPoint.x,endPoint.y,1,randomColor())
+                untangleGame.lines.push(new Line(startPoint,endPoint,untangleGame.thinLineThickness))
+            }
+        }
+    })
+
+    class Circle {
+        constructor(x, y, radius) {
+            this.x = x
+            this.y = y
+            this.radius = radius
+        }
+    }
+
+    class Line {
+        constructor(startPiont, endPoint, thickness) {
+            this.startPiont = startPiont
+            this.endPoint = endPoint
+            this.thickness = thickness
+        }
+    }
+
+    function drawLine(canvas, x1, y1, x2, y2, lineWidth, strokeStyle) {
+        let ctx = canvas.getContext('2d')
+        ctx.beginPath()
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+        ctx.lineWidth = lineWidth
+        ctx.strokeStyle = strokeStyle
+        ctx.stroke()
+    }
+
+    function drawCircle(canvas, fillStyle, x, y, radius, beginAngle, endAngle, acticlockwise) {
+        let ctx = canvas.getContext('2d')
+        ctx.fillStyle = fillStyle
+        ctx.beginPath()
+        ctx.arc(x, y, radius, beginAngle, endAngle, acticlockwise)
+        ctx.closePath()
+        ctx.fill()
+    }
+
+    function randomColor() {
+        return `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},${Math.random()})`
+    }
+
+</script>
+</body>
+</html>
