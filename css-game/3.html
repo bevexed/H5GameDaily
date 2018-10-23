@@ -74,19 +74,19 @@
             opacity: 0
         }
 
-        .cardAQ {
+        .cardAk {
             background-position: 80px 0;
         }
 
-        .cardAK {
+        .cardAQ {
             background-position: 80px 120px;
         }
 
-        .cardBQ {
+        .cardAJ {
             background-position: 80px 240px;
         }
 
-        .cardBX {
+        .cardBK {
             background-position: 160px 0;
         }
 
@@ -94,11 +94,11 @@
             background-position: 240px 0;
         }
 
-        .cardDQ {
+        .cardBQ {
             background-position: 240px 360px;
         }
 
-        .cardDK {
+        .carDBJ {
             background-position: 160px 120px;
         }
     </style>
@@ -156,7 +156,7 @@
             return;
         }
         $(this).addClass("card-flipped")
-        console.log($(this))
+        // console.log($(this))
         if ($(".card-flipped").length == 2) {
             setTimeout(checkPattern, 700)
         }
@@ -167,15 +167,15 @@
             $(".card-flipped").removeClass("card-flipped").addClass("card-removed")
             $(".card-removed").bind("webkitTransitionEnd", removeTookCards)
         } else {
-            $(".card-flipped").removeClass("car-flipped")
+            $(".card-flipped").removeClass("card-flipped")
         }
     }
 
     function isMatchPattern() {
-        let cards = $(".car-flipped")
+        let cards = $(".card-flipped")
         let pattern = $(cards[0]).data("pattern")
         let anotherPattern = $(cards[1]).data("pattern")
-        return (pattern == anotherPattern)
+        return (pattern === anotherPattern)
     }
 
     function removeTookCards() {
