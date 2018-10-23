@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>drawCircle</title>
+    <style>
+        #game {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Drawing in Canvas</h1>
+</header>
+<canvas id="game" width="768" height="400">
+    滚
+</canvas>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    $(function () {
+        let canvas = document.getElementById('game')
+
+        let width = canvas.width
+        let height = canvas.height
+
+        let circleCount = 5
+        for (let i = 0; i < circleCount; i++) {
+            let x = Math.random() * width
+            let y = Math.random() * height
+            drawCircle(canvas, randomColor(), x, y, 30, 0, Math.PI * 2, true)
+        }
+    })
+
+    function randomColor() {
+        return `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},${Math.random()})`
+    }
+
+    function drawCircle(canvas, fillStyle, x, y, radius, beginAngle, endAngle, acticlockwise) {
+        let ctx = canvas.getContext('2d')
+        ctx.fillStyle = fillStyle
+        ctx.beginPath()
+        ctx.arc(x, y, radius, beginAngle, endAngle, acticlockwise)
+        ctx.closePath()
+        ctx.fill()
+    }
+</script>
+</body>
+</html>

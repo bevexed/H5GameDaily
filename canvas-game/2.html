@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>canvas</title>
+    <title>circle</title>
     <style>
         #game {
             background-color: #333;
@@ -21,9 +21,29 @@
     $(function () {
         let canvas = document.getElementById('game')
         let ctx = canvas.getContext('2d')
-        ctx.fillStyle = 'rgba(200,200,100,.6)'
+        ctx.fillStyle = 'rgba(200,200,100,6)'
+
+        //上半圆
         ctx.beginPath()
-        ctx.arc(100, 100, 50, 0, Math.PI * 2, true)
+        ctx.arc(100, 110, 50, 0, Math.PI, true)
+        ctx.closePath()
+        ctx.fill()
+
+        //下半圆
+        ctx.beginPath()
+        ctx.arc(100,160,50,0,Math.PI,false)
+        ctx.closePath()
+        ctx.fill()
+
+        //左半圆
+        ctx.beginPath()
+        ctx.arc(250,110,50,Math.PI*1.5,Math.PI*0.5,true)
+        ctx.closePath()
+        ctx.fill()
+
+        //右半圆
+        ctx.beginPath()
+        ctx.arc(310,110,50,Math.PI*1.5,Math.PI*0.5)
         ctx.closePath()
         ctx.fill()
     })
