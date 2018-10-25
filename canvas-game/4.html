@@ -26,26 +26,54 @@
 
     $(function () {
         let canvas = document.getElementById('game')
+        let ctx = canvas.getContext('2d')
 
         let width = canvas.width
         let height = canvas.height
 
+        let circleRadius = 10
         let circleCount = 5
         for (let i = 0; i < circleCount; i++) {
             let x = Math.random() * width
             let y = Math.random() * height
-            drawCircle(canvas, randomColor(), x, y, 30, 0, Math.PI * 2, true)
-            untangleGame.circles.push(new Circle(x, y, 30))
+            drawCircle(canvas, randomColor(), x, y, circleRadius, 0, Math.PI * 2, true)
+            untangleGame.circles.push(new Circle(x, y, circleRadius))
         }
 
-        for (let i = 0; i < untangleGame.circles.length; i++) {
-            let startPoint = untangleGame.circles[i]
-            for (let j = 0 ; j<i ;j++){
-                let endPoint = untangleGame.circles[j]
-                drawLine(canvas,startPoint.x,startPoint.y,endPoint.x,endPoint.y,1,randomColor())
-                untangleGame.lines.push(new Line(startPoint,endPoint,untangleGame.thinLineThickness))
+        connectCircle(canvas)
+
+        $('#game').mousedown(function (e) {
+            let canvasPosition = $(this).offset()
+            let mouseX = (e.pageX - canvasPosition.left) || 0
+            let mouseY = (e.pageY - canvasPosition.top) || 0
+
+            for (let i = 0; i < untangleGame.circles.length; i++) {
+                let circleX = untangleGame.circles[i].x
+                let circleY = untangleGame.circles[i].y
+                let radius = untangleGame.circles[i].radius
+                if (Math.pow(mouseX - circleX, 2) + Math.pow(mouseY - circleY, 2) < Math.pow(radius, 2)) {
+                    untangleGame.targetCircle = i
+                    break
+                }
             }
-        }
+        })
+
+        $('#game').mousemove(function (e) {
+            if (untangleGame.targetCircle !== undefined) {
+                let canvasPosition = $(this).offset()
+                let mouseX = (e.pageX - canvasPosition.left) || 0
+                let mouseY = (e.pageY - canvasPosition.top) || 0
+                let radius = untangleGame.circles[untangleGame.targetCircle].radius
+                untangleGame.circles[untangleGame.targetCircle] = new Circle(mouseX, mouseY, radius)
+            }
+            connectCircle(canvas)
+        })
+
+        $('#game').mouseup(function (e) {
+            untangleGame.targetCircle = undefined
+        })
+
+        setInterval(gameLoop, 1000/60)
     })
 
     class Circle {
@@ -61,6 +89,17 @@
             this.startPiont = startPiont
             this.endPoint = endPoint
             this.thickness = thickness
+        }
+    }
+
+    function connectCircle(canvas) {
+        untangleGame.lines.length = 0
+        for (let i = 0; i < untangleGame.circles.length; i++) {
+            let startPoint = untangleGame.circles[i]
+            for (let j = 0; j < i; j++) {
+                let endPoint = untangleGame.circles[j]
+                untangleGame.lines.push(new Line(startPoint, endPoint, untangleGame.thinLineThickness))
+            }
         }
     }
 
@@ -83,8 +122,32 @@
         ctx.fill()
     }
 
+    function gameLoop() {
+        let canvas = document.getElementById('game')
+        let ctx = canvas.getContext('2d')
+
+        clearCanvas(canvas)
+        for (let i = 0;i<untangleGame.lines.length;i++){
+            let line = untangleGame.lines[i]
+            let startPoint = line.startPiont
+            let endPoint = line.endPoint
+            let thickness = line.thickness
+            drawLine(canvas,startPoint.x,startPoint.y,endPoint.x,endPoint.y,thickness,randomColor())
+        }
+
+        for (let i = 0;i<untangleGame.circles.length;i++){
+            let circle = untangleGame.circles[i]
+            drawCircle(canvas,randomColor(),circle.x,circle.y,circle.radius,0, Math.PI * 2, true)
+        }
+    }
+
     function randomColor() {
         return `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},${Math.random()})`
+    }
+
+    function clearCanvas(canvas) {
+        let ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
     }
 
 </script>
