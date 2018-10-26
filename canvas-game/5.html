@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>drawCircle</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #game {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Drawing in Canvas</h1>
+</header>
+<canvas id="game" width="768" height="400">
+    滚
+</canvas>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    const untangleGame = {
+        circles: [],
+        thinLineThickness: 1,
+        boldLineThickness: 5,
+        lines: []
+    }
+
+    $(function () {
+        let canvas = document.getElementById('game')
+        let ctx = canvas.getContext('2d')
+
+        let width = canvas.width
+        let height = canvas.height
+
+        let circleRadius = 10
+        let circleCount = 4
+        for (let i = 0; i < circleCount; i++) {
+            let x = Math.random() * width
+            let y = Math.random() * height
+            drawCircle(canvas, 'red', x, y, circleRadius, 0, Math.PI * 2, true)
+            untangleGame.circles.push(new Circle(x, y, circleRadius))
+        }
+
+        connectCircle(canvas)
+
+        $('#game').mousedown(function (e) {
+            let canvasPosition = $(this).offset()
+            let mouseX = (e.pageX - canvasPosition.left) || 0
+            let mouseY = (e.pageY - canvasPosition.top) || 0
+
+            for (let i = 0; i < untangleGame.circles.length; i++) {
+                let circleX = untangleGame.circles[i].x
+                let circleY = untangleGame.circles[i].y
+                let radius = untangleGame.circles[i].radius
+                if (Math.pow(mouseX - circleX, 2) + Math.pow(mouseY - circleY, 2) < Math.pow(radius, 2)) {
+                    untangleGame.targetCircle = i
+                    break
+                }
+            }
+        })
+
+        $('#game').mousemove(function (e) {
+            if (untangleGame.targetCircle !== undefined) {
+                let canvasPosition = $(this).offset()
+                let mouseX = (e.pageX - canvasPosition.left) || 0
+                let mouseY = (e.pageY - canvasPosition.top) || 0
+                let radius = untangleGame.circles[untangleGame.targetCircle].radius
+                untangleGame.circles[untangleGame.targetCircle] = new Circle(mouseX, mouseY, radius)
+            }
+            connectCircle(canvas)
+            updateLineIntersection()
+        })
+
+        $('#game').mouseup(function (e) {
+            untangleGame.targetCircle = undefined
+        })
+
+        setInterval(gameLoop, 1000 / 60)
+    })
+
+    class Circle {
+        constructor(x, y, radius) {
+            this.x = x
+            this.y = y
+            this.radius = radius
+        }
+    }
+
+    class Line {
+        constructor(startPiont, endPoint, thickness) {
+            this.startPiont = startPiont
+            this.endPoint = endPoint
+            this.thickness = thickness
+        }
+    }
+
+    function connectCircle(canvas) {
+        untangleGame.lines.length = 0
+        for (let i = 0; i < untangleGame.circles.length; i++) {
+            let startPoint = untangleGame.circles[i]
+            for (let j = 0; j < i; j++) {
+                let endPoint = untangleGame.circles[j]
+                untangleGame.lines.push(new Line(startPoint, endPoint, untangleGame.thinLineThickness))
+                updateLineIntersection()
+            }
+        }
+    }
+
+    function drawLine(canvas, x1, y1, x2, y2, lineWidth, strokeStyle) {
+        let ctx = canvas.getContext('2d')
+        ctx.beginPath()
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+        ctx.lineWidth = lineWidth
+        ctx.strokeStyle = strokeStyle
+        ctx.stroke()
+    }
+
+    function drawCircle(canvas, fillStyle, x, y, radius, beginAngle, endAngle, acticlockwise) {
+        let ctx = canvas.getContext('2d')
+        ctx.fillStyle = fillStyle
+        ctx.beginPath()
+        ctx.arc(x, y, radius, beginAngle, endAngle, acticlockwise)
+        ctx.closePath()
+        ctx.fill()
+    }
+
+    function gameLoop() {
+        let canvas = document.getElementById('game')
+        let ctx = canvas.getContext('2d')
+
+        clearCanvas(canvas)
+        for (let i = 0; i < untangleGame.lines.length; i++) {
+            let line = untangleGame.lines[i]
+            let startPoint = line.startPiont
+            let endPoint = line.endPoint
+            let thickness = line.thickness
+            drawLine(canvas, startPoint.x, startPoint.y, endPoint.x, endPoint.y, thickness, 'red')
+        }
+
+        for (let i = 0; i < untangleGame.circles.length; i++) {
+            let circle = untangleGame.circles[i]
+            drawCircle(canvas, 'red', circle.x, circle.y, circle.radius, 0, Math.PI * 2, true)
+        }
+    }
+
+    function isIntersect(line1, line2) {
+        //转换line1 成 Ax + By = C
+        let a1 = line1.endPoint.y - line1.startPiont.y
+        let b1 = line1.startPiont.x - line1.endPoint.x
+        let c1 = a1 * line1.startPiont.x + b1 * line1.startPiont.y
+
+        //转化 line2 成 Ax + By = C
+        let a2 = line2.endPoint.y - line2.startPiont.y
+        let b2 = line2.startPiont.x - line2.endPoint.x
+        let c2 = a2 * line2.startPiont.x + b2 * line2.startPiont.y
+
+        //计算交点
+        let d = a1 * b2 - a2 * b1
+
+        //当d === 0，两条直线平行
+        if (d === 0) {
+            return false
+        } else {
+            let x = (b2 * c1 - b1 * c2) / d
+            let y = (a1 * c2 - a2 * c1) / d
+
+            // 检查交点师傅在两条线段之间
+            if ((isInBetween(line1.startPiont.x, x, line1.endPoint.x) || isInBetween(line1.startPiont.y, y, line1.endPoint.y)) && (isInBetween(line2.startPiont.x, x, line2.endPoint.x) || isInBetween(line2.startPiont.y, y, line2.endPoint.y))) {
+                return true
+            }
+        }
+        return false
+    }
+
+    // 如果 b 在 a 和 c 之间返回true
+    // 当 a === b 或 b === c 时 ，返回false
+    function isInBetween(a, b, c) {
+        // 如果b 几乎等于 a 或 c 返回 false
+        // 为了避免在浮点运算时两值几乎相等，但是纯在相差0.00000000000000001这种情况，
+        // 使用下面的方式避免
+        if (Math.abs(a - b) < 0.000001 || Math.abs((b - c) < 0.000001)){
+            return false
+        }
+        // 如果 b 在 a 与 c 之间返回 true
+        return (a < b && b < c) || (c < b && b < a)
+    }
+
+    function updateLineIntersection() {
+        for (let i = 0;i<untangleGame.lines.length;i++){
+            for (let j = 0;j<i;j++){
+                let line1 = untangleGame.lines[i]
+                let line2 = untangleGame.lines[j]
+                // 如果检测到两条直线相交，将该线加粗
+                if(isIntersect(line1,line2)){
+                    line1.thickness = untangleGame.boldLineThickness
+                    line2.thickness  = untangleGame.boldLineThickness
+                }
+
+            }
+        }
+    }
+
+
+
+    function randomColor() {
+        return `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},${Math.random()})`
+    }
+
+    function clearCanvas(canvas) {
+        let ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
+
+</script>
+</body>
+</html>

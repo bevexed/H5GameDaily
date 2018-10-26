@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #game {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Drawing in Canvas</h1>
+</header>
+<canvas id="game" width="768" height="400">
+    滚
+</canvas>
+</body>
+<script src="../bower_components/jq/dist/jquery.min.js"></script>
+<script>
+    let untangleGame = {
+        circles:[],
+    }
+
+    class Circle {
+        constructor(x, y, redius) {
+            this.x = x
+            this.y = y
+            this.redius = redius
+        }
+    }
+
+    $(
+        function () {
+            let canvas = document.getElementById('game')
+            let ctx = canvas.getContext('2d')
+
+            let bgGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height)
+            bgGradient.addColorStop(0, "#ab16ba")
+            bgGradient.addColorStop(1, "#00e3d6")
+            ctx.fillStyle = bgGradient
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+            for (let i = 0 ;i < 5; i++){
+                let radius = Math.floor(Math.random() * 50) + 10
+                let x = canvas.width*Math.random()
+                let y = canvas.height*Math.random()
+                drawCircle(ctx,x,y,radius)
+                untangleGame.circles.push(new Circle(x,y,radius))
+            }
+
+
+
+
+            $('#game').mousedown(function (e) {
+                let canvasPosition = $(this).offset()
+                let mouseX = e.pageX - canvasPosition.left
+                let mouseY = e.pageY - canvasPosition.top
+
+                untangleGame.circles.every(function (item) {
+                    let circleX = item.x
+                    let circleY = item.y
+                    let circleRadius = item.radius
+                    if (Math.pow((mouseX - circleX)) + Math.pow((mouseY - circleY)) > Math.pow()) 
+                })
+            })
+
+            $('#game').mousemove(function (e) {
+                let canvasPosition = $(this).offset()
+                let mouseX = e.pageX - canvasPosition.left
+                let mouseY = e.pageY - canvasPosition.top
+            })
+        }
+    )
+
+    function drawCircle(ctx, x, y, radius) {
+        let circleGradient = ctx.createRadialGradient(x - 3, y - 3, 1, x, y, radius)
+        circleGradient.addColorStop(0, "#ab16ba")
+        circleGradient.addColorStop(1, "#00e3d6")
+        ctx.fillStyle = circleGradient
+
+        ctx.beginPath()
+        ctx.arc(x,y,radius,0,Math.PI*2,true)
+        ctx.closePath()
+        ctx.fill()
+    }
+</script>
+</html>
